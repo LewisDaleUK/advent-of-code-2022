@@ -49,7 +49,7 @@ impl Calories {
     pub fn total_n(&mut self, n: i32) -> i32 {
         self.sort();
         let top = self.packs.iter().take(n.try_into().unwrap());
-       	top.fold(0, |acc, pack| acc + pack.total)
+        top.fold(0, |acc, pack| acc + pack.total)
     }
 }
 

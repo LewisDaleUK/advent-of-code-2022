@@ -1,8 +1,9 @@
 use std::fs;
-use std::path::{Path};
+use std::path::Path;
 
 mod calories;
 mod rps;
+mod rucksack;
 
 fn main() {
     if let Some(calorie_lines) = read_file(Path::new("./src/inputs/calories.txt")) {
@@ -12,9 +13,18 @@ fn main() {
         println!("Total of top 3 elves: {}", cals.total_n(3));
     }
 
-    if let Some(rock_paper_scissors) = read_file(Path::new("./src/inputs/rock-paper-scissors.txt")) {
+    if let Some(rock_paper_scissors) = read_file(Path::new("./src/inputs/rock-paper-scissors.txt"))
+    {
         let game = rps::Game::from_str(&rock_paper_scissors);
         println!("Total score: {}", game.total_score());
+    }
+
+    if let Some(rucksacks) = read_file(Path::new("./src/inputs/rucksacks.txt")) {
+        let total_score = rucksack::score_lines(rucksacks.split('\n').map(String::from).collect());
+        let badge_score =
+            rucksack::group_and_score(rucksacks.split('\n').map(String::from).collect());
+        println!("Total elf score: {}", total_score);
+        println!("Total badge score: {}", badge_score);
     }
 }
 
