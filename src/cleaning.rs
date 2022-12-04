@@ -4,10 +4,7 @@ use itertools::Itertools;
 
 fn parse_range(range: &str) -> HashSet<i32> {
 	let pieces: Vec<i32> = range.split('-').map(|r| r.parse::<i32>().unwrap()).collect();
-	if pieces[0] == pieces[1] {
-		return HashSet::from([pieces[0]]);
-	}
- 	(pieces[0] .. pieces[1] + 1).collect()
+ 	(pieces[0]..=pieces[1]).collect()
 }
 
 pub fn range_overlaps(range: &str) -> bool {

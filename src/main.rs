@@ -1,8 +1,6 @@
 use std::fs;
 use std::path::Path;
 
-use itertools::Itertools;
-
 mod calories;
 mod rps;
 mod rucksack;
