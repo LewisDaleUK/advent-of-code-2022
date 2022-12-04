@@ -1,9 +1,12 @@
 use std::fs;
 use std::path::Path;
 
+use itertools::Itertools;
+
 mod calories;
 mod rps;
 mod rucksack;
+mod cleaning;
 
 fn main() {
     if let Some(calorie_lines) = read_file(Path::new("./src/inputs/calories.txt")) {
@@ -25,6 +28,17 @@ fn main() {
             rucksack::group_and_score(rucksacks.split('\n').map(String::from).collect());
         println!("Total elf score: {}", total_score);
         println!("Total badge score: {}", badge_score);
+    }
+
+    if let Some(schedule) = read_file(Path::new("./src/inputs/cleaning-schedule.txt")) {
+        let overlaps: Vec<&str> = schedule.split('\n').filter(|a| {
+            if a.is_empty() {
+                false 
+            } else {
+                cleaning::range_overlaps(*a)
+            }
+        }).collect();
+        println!("Total cleaning schedules with overlaps: {}", overlaps.len());
     }
 }
 
