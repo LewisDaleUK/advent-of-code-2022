@@ -5,6 +5,7 @@ mod calories;
 mod rps;
 mod rucksack;
 mod cleaning;
+mod stacks;
 
 fn main() {
     if let Some(calorie_lines) = read_file(Path::new("./src/inputs/calories.txt")) {
@@ -37,6 +38,14 @@ fn main() {
             }
         }).collect();
         println!("Total cleaning schedules with overlaps: {}", overlaps.len());
+    }
+
+    if let Some(crane_ops) = read_file(Path::new("./src/inputs/crane_ops.txt")) {
+        let mut crane = stacks::Crane::from_str(&crane_ops);
+        let output = crane.operate_all();
+
+        println!("{:#?}", crane.stacks);
+        println!("{}", output);
     }
 }
 
