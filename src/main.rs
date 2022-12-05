@@ -2,9 +2,9 @@ use std::fs;
 use std::path::Path;
 
 mod calories;
+mod cleaning;
 mod rps;
 mod rucksack;
-mod cleaning;
 mod stacks;
 
 fn main() {
@@ -30,14 +30,16 @@ fn main() {
     }
 
     if let Some(schedule) = read_file(Path::new("./src/inputs/cleaning-schedule.txt")) {
-        let overlaps: Vec<&str> = schedule.split('\n').filter(|a| {
-            if a.is_empty() {
-                false 
-            } else {
-                cleaning::range_overlaps(*a)
-            }
-        }).collect();
-        println!("Total cleaning schedules with overlaps: {}", overlaps.len());
+        let overlaps = schedule
+            .split('\n')
+            .filter(|a| {
+                if a.is_empty() {
+                    false
+                } else {
+                    cleaning::range_overlaps(a)
+                }
+            });
+        println!("Total cleaning schedules with overlaps: {}", overlaps.count());
     }
 
     if let Some(crane_ops) = read_file(Path::new("./src/inputs/crane_ops.txt")) {
