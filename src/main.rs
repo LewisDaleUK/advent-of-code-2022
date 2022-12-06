@@ -3,6 +3,7 @@ use std::path::Path;
 
 mod calories;
 mod cleaning;
+mod communication;
 mod rps;
 mod rucksack;
 mod stacks;
@@ -30,24 +31,30 @@ fn main() {
     }
 
     if let Some(schedule) = read_file(Path::new("./src/inputs/cleaning-schedule.txt")) {
-        let overlaps = schedule
-            .split('\n')
-            .filter(|a| {
-                if a.is_empty() {
-                    false
-                } else {
-                    cleaning::range_overlaps(a)
-                }
-            });
-        println!("Total cleaning schedules with overlaps: {}", overlaps.count());
+        let overlaps = schedule.split('\n').filter(|a| {
+            if a.is_empty() {
+                false
+            } else {
+                cleaning::range_overlaps(a)
+            }
+        });
+        println!(
+            "Total cleaning schedules with overlaps: {}",
+            overlaps.count()
+        );
     }
 
     if let Some(crane_ops) = read_file(Path::new("./src/inputs/crane_ops.txt")) {
         let mut crane = stacks::Crane::from_str(&crane_ops);
         let output = crane.operate_all();
 
-        println!("{:#?}", crane.stacks);
         println!("{}", output);
+    }
+
+    if let Some(comms) = read_file(Path::new("./src/inputs/communication.txt")) {
+        if let Some(idx) = communication::find_marker_index(&comms, 14) {
+            println!("Found marker at position {}", idx);
+        }
     }
 }
 
