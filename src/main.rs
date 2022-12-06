@@ -1,6 +1,8 @@
 use std::fs;
 use std::path::Path;
 
+use communication::FindUnique;
+
 mod calories;
 mod cleaning;
 mod communication;
@@ -52,7 +54,7 @@ fn main() {
     }
 
     if let Some(comms) = read_file(Path::new("./src/inputs/communication.txt")) {
-        if let Some(idx) = communication::find_marker_index(&comms, 14) {
+        if let Some(idx) = comms.find_unique(14) {
             println!("Found marker at position {}", idx);
         }
     }
