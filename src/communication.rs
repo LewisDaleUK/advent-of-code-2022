@@ -1,19 +1,19 @@
 use std::collections::HashSet;
 
 pub trait FindUnique {
-	fn find_unique(&self, offset: usize) -> Option<usize>;
+    fn find_unique(&self, offset: usize) -> Option<usize>;
 }
 
 impl FindUnique for str {
-	fn find_unique(&self, offset: usize) -> Option<usize> {
-		for idx in offset..self.len() {
-			let len = HashSet::<char>::from_iter(self[idx - offset..idx].chars()).len();
-			if len == offset {
-				return Some(idx);
-			}
-		}
-		None
-	}
+    fn find_unique(&self, offset: usize) -> Option<usize> {
+        for idx in offset..self.len() {
+            let len = HashSet::<char>::from_iter(self[idx - offset..idx].chars()).len();
+            if len == offset {
+                return Some(idx);
+            }
+        }
+        None
+    }
 }
 
 #[cfg(test)]

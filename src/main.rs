@@ -2,10 +2,13 @@ use std::fs;
 use std::path::Path;
 
 use communication::FindUnique;
+use itertools::Itertools;
 
 mod calories;
 mod cleaning;
 mod communication;
+mod directory_parser;
+mod file_node;
 mod rps;
 mod rucksack;
 mod stacks;
@@ -57,6 +60,16 @@ fn main() {
         if let Some(idx) = comms.find_unique(14) {
             println!("Found marker at position {}", idx);
         }
+    }
+
+    if let Some(commands) = read_file(Path::new("./src/inputs/commands.txt")) {
+        let mut inputs = commands.split('\n').collect_vec();
+        inputs.pop();
+        let filesystem = directory_parser::FileSystem::new(inputs);
+        let total = filesystem.find_dirs_by_max_size(100000);
+
+        println!("Total size of dirs < 100000: {}", total);
+        println!("Smallest dir that can be deleted: {}", filesystem.free_size(70000000, 30000000));
     }
 }
 
