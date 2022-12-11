@@ -53,8 +53,8 @@ impl FileSystem {
         for input in inputs {
             let parts = input.split(' ').collect_vec();
             match parts[0] {
-                "$" => match parts[1] {
-                    "cd" => match parts[2] {
+                "$" => if parts[1] == "cd" {
+                    match parts[2] {
                         ".." => {
                             let parent = node.borrow().parent.clone().unwrap();
                             node = parent;
@@ -69,8 +69,7 @@ impl FileSystem {
                                 .clone();
                             node = child;
                         }
-                    },
-                    _ => (),
+                    }
                 },
                 "dir" => {
                     let dir = node
@@ -101,7 +100,7 @@ impl FileSystem {
             .find_dirs()
             .iter()
             .filter(|node| node.get_size() < max)
-            .fold(0 as usize, |acc, node| acc + node.get_size())
+            .fold(0_usize, |acc, node| acc + node.get_size())
     }
 
     pub fn find_dir_by_min_size(&self, min: usize) -> usize {
@@ -114,11 +113,11 @@ impl FileSystem {
             .get_size()
     }
 
-	pub fn free_size(&self, total: usize, target: usize) -> usize {
-		let unused = total - self.nodes.get_size();
-		let diff = target - unused;
-		self.find_dir_by_min_size(diff)
-	}
+    pub fn free_size(&self, total: usize, target: usize) -> usize {
+        let unused = total - self.nodes.get_size();
+        let diff = target - unused;
+        self.find_dir_by_min_size(diff)
+    }
 }
 
 #[cfg(test)]
@@ -127,8 +126,8 @@ mod tests {
 
     use itertools::Itertools;
 
-    use super::HasParent;
     use super::FileSystem;
+    use super::HasParent;
 
     #[test]
     fn it_should_assert_that_a_path_has_a_parent() {
@@ -138,8 +137,8 @@ mod tests {
         assert_eq!(expectations, actual);
     }
 
-	#[test]
-	fn it_should_free_the_right_size() {
+    #[test]
+    fn it_should_free_the_right_size() {
         let binding = "$ cd /
 		$ ls
 		dir a
@@ -170,7 +169,7 @@ mod tests {
 
         let expected = 24933642;
         assert_eq!(expected, files.free_size(70000000, 30000000));
-	}
+    }
 
     #[test]
     fn it_finds_size_of_smallest_directory_to_free_up_space() {

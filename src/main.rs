@@ -5,18 +5,18 @@ use communication::FindUnique;
 use itertools::Itertools;
 use rope::RopeBridge;
 
-use crate::trees::{Visible, Scenic};
+use crate::trees::{Scenic, Visible};
 
 mod calories;
 mod cleaning;
 mod communication;
 mod directory_parser;
 mod file_node;
+mod rope;
 mod rps;
 mod rucksack;
 mod stacks;
 mod trees;
-mod rope;
 
 fn main() {
     if let Some(calorie_lines) = read_file(Path::new("./src/inputs/calories.txt")) {
@@ -74,7 +74,10 @@ fn main() {
         let total = filesystem.find_dirs_by_max_size(100000);
 
         println!("Total size of dirs < 100000: {}", total);
-        println!("Smallest dir that can be deleted: {}", filesystem.free_size(70000000, 30000000));
+        println!(
+            "Smallest dir that can be deleted: {}",
+            filesystem.free_size(70000000, 30000000)
+        );
     }
 
     if let Some(tree_data) = read_file(Path::new("./src/inputs/trees.txt")) {

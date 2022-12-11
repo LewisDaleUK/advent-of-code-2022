@@ -1,13 +1,12 @@
-use num_integer::{Roots, Integer};
+use num_integer::Roots;
 use std::collections::HashSet;
-use itertools::Itertools;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Move {
-	U,
+    U,
     D,
     L,
-    R
+    R,
 }
 
 impl Move {
@@ -17,7 +16,7 @@ impl Move {
             "L" => Some(Move::L),
             "U" => Some(Move::U),
             "R" => Some(Move::R),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -75,10 +74,10 @@ impl Vector for Position {
     }
 
     fn adjacent(&self, other: Self) -> bool {
-        let mut diff = self.clone();
+        let mut diff = *self;
         diff.sub(other);
         diff.magnitude() <= 1
-	}
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -88,42 +87,42 @@ pub struct Knot {
 }
 
 impl Default for Knot {
-	fn default() -> Self {
-		Knot {
+    fn default() -> Self {
+        Knot {
             position: (0, 0),
-            history: HashSet::from_iter(vec![(0, 0)])
-		}
-	}
+            history: HashSet::from_iter(vec![(0, 0)]),
+        }
+    }
 }
 
 impl Knot {
-	pub fn visited(&self) -> usize {
-		self.history.len()
-	}
+    pub fn visited(&self) -> usize {
+        self.history.len()
+    }
 }
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct RopeBridge {
-	head: Knot,
-	pub tail: Knot,
+    head: Knot,
+    pub tail: Knot,
 }
 
 impl RopeBridge {
-	fn align_tail(&mut self) {
-		let mut head = self.head.position.clone();
-		let mut tail = self.tail.position.clone();
+    fn align_tail(&mut self) {
+        let mut head = self.head.position;
+        let mut tail = self.tail.position;
 
-		if !head.adjacent(tail) {
-			head.sub(tail);
+        if !head.adjacent(tail) {
+            head.sub(tail);
             head.normalize();
             tail.add(head);
 
-            self.tail.position = tail.clone();
-			self.tail.history.insert(self.tail.position);
-		}
-	}
+            self.tail.position = tail;
+            self.tail.history.insert(self.tail.position);
+        }
+    }
 
-	pub fn perform_move(&mut self, movement: Move, amount: usize) {
+    pub fn perform_move(&mut self, movement: Move, amount: usize) {
         for _ in 0..amount {
             let mut head = self.head.position;
             match movement {
@@ -132,77 +131,102 @@ impl RopeBridge {
                 Move::L => head.0 -= 1,
                 Move::R => head.0 += 1,
             };
-            self.head.position = head.clone();
+            self.head.position = head;
             self.head.history.insert(self.head.position);
             self.align_tail();
         }
-	}
+    }
 
-	pub fn process(&mut self, input: Vec<&str>) {
-		for line in input {
-            let (action, amount) = line.split_once(" ").unwrap();
-			let action = Move::from_str(action);
-			self.perform_move(action.unwrap(), amount.parse().unwrap());
-		}
-	}
+    pub fn process(&mut self, input: Vec<&str>) {
+        for line in input {
+            let (action, amount) = line.split_once(' ').unwrap();
+            let action = Move::from_str(action);
+            self.perform_move(action.unwrap(), amount.parse().unwrap());
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashSet;
     use crate::rope::{Move, Position};
+    use std::collections::HashSet;
 
-    use super::{RopeBridge, Knot};
+    use super::{Knot, RopeBridge};
 
-	#[test]
-	fn it_should_create_a_default_rope_bridge() {
-		let expected = RopeBridge {
-			head: Knot {
+    #[test]
+    fn it_should_create_a_default_rope_bridge() {
+        let expected = RopeBridge {
+            head: Knot {
                 position: (0, 0),
                 history: HashSet::from_iter(vec![(0, 0)]),
-			},
-			tail: Knot {
+            },
+            tail: Knot {
                 position: (0, 0),
                 history: HashSet::from_iter(vec![(0, 0)]),
-			}
-		};
-		let actual = RopeBridge::default();
-		assert_eq!(expected, actual);
-	}
+            },
+        };
+        let actual = RopeBridge::default();
+        assert_eq!(expected, actual);
+    }
 
-	#[test]
-	fn it_should_perform_a_move() {
-		let mut bridge = RopeBridge::default();
-		bridge.perform_move(Move::R, 4);
-		bridge.perform_move(Move::U, 4);
-		bridge.perform_move(Move::L, 3);
+    #[test]
+    fn it_should_perform_a_move() {
+        let mut bridge = RopeBridge::default();
+        bridge.perform_move(Move::R, 4);
+        bridge.perform_move(Move::U, 4);
+        bridge.perform_move(Move::L, 3);
         bridge.perform_move(Move::D, 1);
-		bridge.perform_move(Move::R, 4);
-		bridge.perform_move(Move::D, 1);
-		bridge.perform_move(Move::L, 5);
-		bridge.perform_move(Move::R, 2);
-
+        bridge.perform_move(Move::R, 4);
+        bridge.perform_move(Move::D, 1);
+        bridge.perform_move(Move::L, 5);
+        bridge.perform_move(Move::R, 2);
 
         let expected = HashSet::from_iter(vec![
-        (0, 0), (1, 0), (2, 0), (3, 0),
-        (4, 1), (4, 2), (4, 3),
-        (3, 4), (2, 4),
-        (3, 3), (4, 3),
-        (3, 2), (2, 2), (1, 2),
+            (0, 0),
+            (1, 0),
+            (2, 0),
+            (3, 0),
+            (4, 1),
+            (4, 2),
+            (4, 3),
+            (3, 4),
+            (2, 4),
+            (3, 3),
+            (4, 3),
+            (3, 2),
+            (2, 2),
+            (1, 2),
         ]);
 
         let expected_head = HashSet::from_iter(vec![
-        (0, 0), (1, 0), (2, 0), (3, 0), (4, 0),
-        (4, 1), (4, 2), (4, 3), (4, 4),
-        (3, 4), (2, 4), (1, 4),
-        (1, 3),
-        (2, 3), (3, 3), (4, 3), (5, 3),
-        (5, 2),
-        (4, 2), (3, 2), (2, 2), (1, 2), (0, 2),
-        (1, 2), (2, 2)
+            (0, 0),
+            (1, 0),
+            (2, 0),
+            (3, 0),
+            (4, 0),
+            (4, 1),
+            (4, 2),
+            (4, 3),
+            (4, 4),
+            (3, 4),
+            (2, 4),
+            (1, 4),
+            (1, 3),
+            (2, 3),
+            (3, 3),
+            (4, 3),
+            (5, 3),
+            (5, 2),
+            (4, 2),
+            (3, 2),
+            (2, 2),
+            (1, 2),
+            (0, 2),
+            (1, 2),
+            (2, 2),
         ]);
-		assert_eq!(bridge.head.history, expected_head);
-		assert_eq!(expected, bridge.tail.history);
-		assert_eq!(bridge.tail.visited(), 13);
-	}
+        assert_eq!(bridge.head.history, expected_head);
+        assert_eq!(expected, bridge.tail.history);
+        assert_eq!(bridge.tail.visited(), 13);
+    }
 }

@@ -21,11 +21,7 @@ trait PathRoot {
 
 impl PathRoot for Path {
     fn root(&self) -> Option<PathBuf> {
-        if let Some(root) = self.components().nth(0) {
-            Some(Path::new(root.as_os_str()).to_path_buf())
-        } else {
-            None
-        }
+        self.components().next().map(|root| Path::new(root.as_os_str()).to_path_buf())
     }
 
     fn tail(&self) -> Option<PathBuf> {
@@ -41,7 +37,7 @@ impl PathRoot for Path {
 
 impl FileNode {
     pub fn get_size(&self) -> usize {
-        if self.children.len() > 0 {
+        if !self.children.is_empty() {
             self.children
                 .iter()
                 .fold(0, |acc, (_, child)| acc + child.borrow_mut().get_size())
