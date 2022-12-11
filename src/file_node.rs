@@ -21,7 +21,9 @@ trait PathRoot {
 
 impl PathRoot for Path {
     fn root(&self) -> Option<PathBuf> {
-        self.components().next().map(|root| Path::new(root.as_os_str()).to_path_buf())
+        self.components()
+            .next()
+            .map(|root| Path::new(root.as_os_str()).to_path_buf())
     }
 
     fn tail(&self) -> Option<PathBuf> {

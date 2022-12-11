@@ -101,38 +101,58 @@ impl Knot {
     }
 }
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct RopeBridge {
-    head: Knot,
-    pub tail: Knot,
+    pub knots: Vec<Knot>,
+}
+
+impl Default for RopeBridge {
+    fn default() -> RopeBridge {
+        RopeBridge {
+            knots: vec![Knot::default(), Knot::default()],
+        }
+    }
 }
 
 impl RopeBridge {
+    pub fn new(count: usize) -> RopeBridge {
+        RopeBridge {
+            knots: (0..count).map(|_| Knot::default()).collect(),
+        }
+    }
+
+    pub fn tail(&self) -> &Knot {
+        self.knots.last().unwrap()
+    }
+
     fn align_tail(&mut self) {
-        let mut head = self.head.position;
-        let mut tail = self.tail.position;
+        for i in 1..self.knots.len() {
+            let mut head = self.knots.get(i - 1).unwrap().position;
+            let mut tail = self.knots.get(i).unwrap().position;
 
-        if !head.adjacent(tail) {
-            head.sub(tail);
-            head.normalize();
-            tail.add(head);
+            if !head.adjacent(tail) {
+                head.sub(tail);
+                head.normalize();
+                tail.add(head);
 
-            self.tail.position = tail;
-            self.tail.history.insert(self.tail.position);
+                let mut last = self.knots.get_mut(i).unwrap();
+                last.position = tail;
+                last.history.insert(tail);
+            }
         }
     }
 
     pub fn perform_move(&mut self, movement: Move, amount: usize) {
         for _ in 0..amount {
-            let mut head = self.head.position;
+            let mut head = self.knots.first_mut().unwrap();
             match movement {
-                Move::D => head.1 -= 1,
-                Move::U => head.1 += 1,
-                Move::L => head.0 -= 1,
-                Move::R => head.0 += 1,
+                Move::D => head.position.1 -= 1,
+                Move::U => head.position.1 += 1,
+                Move::L => head.position.0 -= 1,
+                Move::R => head.position.0 += 1,
             };
-            self.head.position = head;
-            self.head.history.insert(self.head.position);
+            head.history.insert(head.position);
+
             self.align_tail();
         }
     }
@@ -148,7 +168,7 @@ impl RopeBridge {
 
 #[cfg(test)]
 mod tests {
-    use crate::rope::{Move, Position};
+    use crate::rope::Move;
     use std::collections::HashSet;
 
     use super::{Knot, RopeBridge};
@@ -156,14 +176,16 @@ mod tests {
     #[test]
     fn it_should_create_a_default_rope_bridge() {
         let expected = RopeBridge {
-            head: Knot {
-                position: (0, 0),
-                history: HashSet::from_iter(vec![(0, 0)]),
-            },
-            tail: Knot {
-                position: (0, 0),
-                history: HashSet::from_iter(vec![(0, 0)]),
-            },
+            knots: vec![
+                Knot {
+                    position: (0, 0),
+                    history: HashSet::from_iter(vec![(0, 0)]),
+                },
+                Knot {
+                    position: (0, 0),
+                    history: HashSet::from_iter(vec![(0, 0)]),
+                },
+            ],
         };
         let actual = RopeBridge::default();
         assert_eq!(expected, actual);
@@ -225,8 +247,26 @@ mod tests {
             (1, 2),
             (2, 2),
         ]);
-        assert_eq!(bridge.head.history, expected_head);
-        assert_eq!(expected, bridge.tail.history);
-        assert_eq!(bridge.tail.visited(), 13);
+        assert_eq!(bridge.knots.first().unwrap().history, expected_head);
+        assert_eq!(expected, bridge.tail().history);
+        assert_eq!(bridge.tail().visited(), 13);
+    }
+
+    #[test]
+    pub fn it_simulates_a_larger_rope() {
+        let input = "R 5
+        U 8
+        L 8
+        D 3
+        R 17
+        D 10
+        L 25
+        U 20"
+            .replace('\t', "")
+            .replace("    ", "");
+        let mut bridge = RopeBridge::new(10);
+
+        bridge.process(input.lines().collect());
+        assert_eq!(bridge.tail().visited(), 36);
     }
 }

@@ -53,24 +53,26 @@ impl FileSystem {
         for input in inputs {
             let parts = input.split(' ').collect_vec();
             match parts[0] {
-                "$" => if parts[1] == "cd" {
-                    match parts[2] {
-                        ".." => {
-                            let parent = node.borrow().parent.clone().unwrap();
-                            node = parent;
-                        }
-                        "/" => (),
-                        _ => {
-                            let child = node
-                                .borrow_mut()
-                                .children
-                                .entry(parts[2].to_string())
-                                .or_default()
-                                .clone();
-                            node = child;
+                "$" => {
+                    if parts[1] == "cd" {
+                        match parts[2] {
+                            ".." => {
+                                let parent = node.borrow().parent.clone().unwrap();
+                                node = parent;
+                            }
+                            "/" => (),
+                            _ => {
+                                let child = node
+                                    .borrow_mut()
+                                    .children
+                                    .entry(parts[2].to_string())
+                                    .or_default()
+                                    .clone();
+                                node = child;
+                            }
                         }
                     }
-                },
+                }
                 "dir" => {
                     let dir = node
                         .borrow_mut()

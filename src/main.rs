@@ -89,10 +89,10 @@ fn main() {
 
     if let Some(movements) = read_file(Path::new("./src/inputs/movements.txt")) {
         let lines = movements.lines().collect_vec();
-        let mut rope = RopeBridge::default();
+        let mut rope = RopeBridge::new(10);
         rope.process(lines);
 
-        println!("Made {} moves", rope.tail.visited());
+        println!("Made {} moves", rope.tail().visited());
     }
 }
 
