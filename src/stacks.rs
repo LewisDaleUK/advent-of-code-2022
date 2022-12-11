@@ -219,11 +219,11 @@ mod tests {
             ]),
         };
         let expected = Crane {
-            stacks: vec![String::from("M"), String::from("C"), String::from("DNZP")],
+            stacks: vec![String::from("C"), String::from("M"), String::from("ZNDP")],
             operations: VecDeque::new(),
         };
         let output = crane.operate_all();
         assert_eq!(expected, crane);
-        assert_eq!("MCD", output);
+        assert_eq!("CMZ", output);
     }
 }

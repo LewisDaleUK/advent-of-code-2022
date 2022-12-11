@@ -3,6 +3,9 @@ use std::path::Path;
 
 use communication::FindUnique;
 use itertools::Itertools;
+use rope::RopeBridge;
+
+use crate::trees::{Visible, Scenic};
 
 mod calories;
 mod cleaning;
@@ -12,6 +15,8 @@ mod file_node;
 mod rps;
 mod rucksack;
 mod stacks;
+mod trees;
+mod rope;
 
 fn main() {
     if let Some(calorie_lines) = read_file(Path::new("./src/inputs/calories.txt")) {
@@ -70,6 +75,21 @@ fn main() {
 
         println!("Total size of dirs < 100000: {}", total);
         println!("Smallest dir that can be deleted: {}", filesystem.free_size(70000000, 30000000));
+    }
+
+    if let Some(tree_data) = read_file(Path::new("./src/inputs/trees.txt")) {
+        let inputs = tree_data.lines().collect_vec();
+        let grid = trees::construct(inputs);
+        println!("There are {} trees visible", grid.count_visible());
+        println!("Highest tree score: {}", grid.highest_score());
+    }
+
+    if let Some(movements) = read_file(Path::new("./src/inputs/movements.txt")) {
+        let lines = movements.lines().collect_vec();
+        let mut rope = RopeBridge::default();
+        rope.process(lines);
+
+        println!("Made {} moves", rope.tail.visited());
     }
 }
 
