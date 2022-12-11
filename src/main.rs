@@ -17,6 +17,7 @@ mod rps;
 mod rucksack;
 mod stacks;
 mod trees;
+mod crt;
 
 fn main() {
     if let Some(calorie_lines) = read_file(Path::new("./src/inputs/calories.txt")) {
@@ -93,6 +94,13 @@ fn main() {
         rope.process(lines);
 
         println!("Made {} moves", rope.tail().visited());
+    }
+
+    if let Some(instructions) = read_file(Path::new("./src/inputs/cpu.txt")) {
+        let lines = instructions.lines().collect_vec();
+        let mut cpu = crt::CPU::default();
+        cpu.run_program(lines);
+        println!("Signal strength: {}", cpu.total_signal_strength());
     }
 }
 
