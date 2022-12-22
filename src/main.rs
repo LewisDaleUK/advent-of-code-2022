@@ -18,6 +18,7 @@ mod rucksack;
 mod stacks;
 mod trees;
 mod crt;
+mod monkeys;
 
 fn main() {
     if let Some(calorie_lines) = read_file(Path::new("./src/inputs/calories.txt")) {
