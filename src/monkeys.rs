@@ -42,7 +42,9 @@ fn parse_target(i: &str) -> IResult<&str, OperationTarget> {
 }
 
 fn parse_operation(i: &str) -> IResult<&str, Operation> {
-    let op_parser = preceded(tag("new = old "), tuple((one_of("*+"), space0, parse_target)));
+    let op_parser = preceded(
+        tag("new = old "), 
+        tuple((one_of("*+"), space0, parse_target)));
 
     let (i, (_, _, (op, _, target), _)) = tuple((space1, tag("Operation: "), op_parser, tag("\n")))(i)?;
 
@@ -55,15 +57,27 @@ fn parse_operation(i: &str) -> IResult<&str, Operation> {
     Ok((i, op))
 }
 
+fn parse_test(i: &str) -> IResult<&str, Test> {
+    let parse_test = map(cci32, If::Divisible);
+    let parse_true = preceded(tuple((tag("\n"), space1, tag("If true: throw to monkey "))), cci32);
+    let parse_false = preceded(tuple((tag("\n"), space1, tag("If false: throw to monkey "))), cci32);
+
+    preceded(
+        tuple((space1, tag("Test: divisible by "))),
+               tuple((parse_test, parse_true, parse_false))
+    )(i)
+}
+
 fn parse_monkey(input: &str) -> IResult<&str, Monkey> {
     let (i, _) = tuple((space0, tag("Monkey "), cci32, tag(":\n")))(input)?;
     let (i, items) = parse_items(i)?;
     let (i, operation) = parse_operation(i)?;
+    let (_, test) = parse_test(i)?;
 
     Ok((input, Monkey {
         items,
         operation,
-        test: (If::Divisible(0), 0, 0)
+        test
     }))
 }
 
@@ -84,8 +98,6 @@ mod tests {
          + "        If true: throw to monkey 2\n"
          + "        If false: throw to monkey 3\n";
         
-        // println!("{}", input);
-
         let (_, result) = super::parse_monkey(&input).unwrap();
         assert_eq!(expected, result);
     }
